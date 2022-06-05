@@ -1,0 +1,1 @@
+baseComp <-  read.csv("violenciaGen.csv")
