@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 #cargo de librerias
 library(tidyverse)
 library(dplyr)
+library(R2jags)
+library(HDInterval)
 ```
 
 
@@ -25,6 +27,9 @@ head(baseComp)
 ```{r}
 summary(as.factor(baseComp$pac_hos_))
 ```
+```{r}
+
+```
 
 
 
@@ -35,3 +40,36 @@ summary(as.factor(baseComp$pac_hos_))
 # problemas y dificultades encontradas 
 
 
+
+## creacion del modelo 
+
+$$Y_i = paciente  \ \ hospitalizado \ \ 0: Si \ \ 1: No $$
+
+donde el modelo logistico esta dado por:
+
+$$\pi_i = \frac{e^{X^t_i\beta}}{1 + e^{X^t_i\beta}}$$
+
+```{r}
+#MUESTRA DE 700 INDIVIDUOS
+set.seed(123)
+indv = sample(1:length(baseComp$pac_hos_), 700)
+baseComp2 = baseComp[indv,c(3,5,8,13,14)]
+head(baseComp2)
+```
+
+```{r}
+baseComp2 = baseComp2[-which(baseComp2==-99, arr.ind = TRUE), ] #no se que hace esta monda
+dim(baseComp2)
+
+# definiendo variables del modelo
+y = as.factor(baseComp2$pac_hos_)
+x1 = baseComp2$edad_
+x2 = as.factor(baseComp2$sexo_)
+x3 = as.factor(baseComp2$mod_viol)
+x4 = as.factor(baseComp2$tipo_ss_)
+# matriz de diseño
+X = model.matrix(~ x1 + x2 + x3 + x4)
+head(X)
+```
+
+O sea tiene que tener a lo sumo dos niveles cada categoria 
