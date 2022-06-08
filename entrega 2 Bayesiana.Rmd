@@ -9,4 +9,29 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r,warning=FALSE,message=FALSE}
+#cargo de librerias
+library(tidyverse)
+library(dplyr)
+```
+
+
+
+```{r}
+# lectura de base de datos
+baseComp <- read.csv2("sivigila_violencia.csv")
+head(baseComp)
+```
+```{r}
+summary(as.factor(baseComp$pac_hos_))
+```
+
+
+
+
+## Depuración de la base de datos 
+
+
+# problemas y dificultades encontradas 
+
 
