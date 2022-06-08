@@ -27,10 +27,6 @@ head(baseComp)
 ```{r}
 summary(as.factor(baseComp$pac_hos_))
 ```
-```{r}
-
-```
-
 
 
 
@@ -58,12 +54,12 @@ head(baseComp2)
 ```
 
 ```{r}
-baseComp2 = baseComp2[-which(baseComp2==-99, arr.ind = TRUE), ] #no se que hace esta monda
 dim(baseComp2)
 
 # definiendo variables del modelo
 y = as.factor(baseComp2$pac_hos_)
 x1 = baseComp2$edad_
+head(x1)
 x2 = as.factor(baseComp2$sexo_)
 x3 = as.factor(baseComp2$mod_viol)
 x4 = as.factor(baseComp2$tipo_ss_)
@@ -72,4 +68,51 @@ X = model.matrix(~ x1 + x2 + x3 + x4)
 head(X)
 ```
 
+```{r}
+modelo1 <- function(){
+  for (i in 1:N) {
+    y[i] ~ dbern(p[i])
+   # logit(p[i]) <- max(-20,min(20,inprod(b[], x[i,])))
+    logit(p[i]) <- inprod(b[], x[i,]) # producto entre las cobaviables (predictor)
+  }
+  for (j in 1:K) {
+    b[j] ~ dnorm(0,1.0E-12) # definiendo aprioris poco informativas vagas
+  }
+}
+```
+
+```{r}
+#Tamano de la muestra
+N = dim(baseComp2)[1]
+# Input o informacion de entrada
+data.input.jags <- list(y=y, x = X, N = N, K = ncol(X))
+#Parametros a monitorear
+bayes.mod.params <- c("b")
+```
+
+```{r}
+#Puntos iniciales de la cadena MCMC
+bayes.mod.inits <- function(){
+  list("b" = rnorm(11))
+}
+```
+
+```{r}
+set.seed(123)
+bayes.mod.fit <- jags(data = data.input.jags, inits = bayes.mod.inits,
+                       parameters.to.save = bayes.mod.params, n.chains = 3, n.iter = 9000,
+                       n.burnin = 1000, model.file = modelo1)
+
+
+print(bayes.mod.fit)
+traceplot(bayes.mod.fit)
+```
+
+
 O sea tiene que tener a lo sumo dos niveles cada categoria 
+
+
+```{r}
+ head(baseComp2$edad_)
+```
+
