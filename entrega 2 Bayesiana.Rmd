@@ -1,0 +1,12 @@
+---
+title: "entrega 2 Bayesiana"
+author: "Genaro Alfonso Aristizabal Echeverri"
+date: "7/6/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
