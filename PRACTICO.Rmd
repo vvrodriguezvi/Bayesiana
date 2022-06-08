@@ -1,0 +1,18 @@
+---
+title: "TRABAJO PRÁCTICO"
+author: "Valentina Vanessa Rodriguez Villamizar"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+
+baseComp <- read.csv2("sivigila_violencia.csv")
+
+```
+
+
+## BASE DE DATOS: Vigilancia en salud pública de las violencias de género
+
