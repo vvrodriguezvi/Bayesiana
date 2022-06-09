@@ -6,13 +6,48 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(dplyr)
+```
+
+```{r,warning=FALSE,message=FALSE}
+#cargo de librerias
 library(tidyverse)
+library(dplyr)
+library(R2jags)
+library(HDInterval)
+```
 
-baseComp <- read.csv2("sivigila_violencia.csv")
+## BASE DE DATOS: Vigilancia en salud pública de las violencias de género
 
+```{r}
+# lectura de base de datos
+baseComp <- read.csv2("baseUsar.csv")
+head(baseComp)
+```
+```{r}
+# organizando los barrios
+base <- baseComp %>%
+  select("Edad","nombre_barrio","sexo_", "comuna","tip_cas_","tipo_ss_",
+         "pac_hos_","modoViol", "year_") %>%
+  filter(baseComp$nombre_barrio!="SIN INFORMACION",baseComp$nombre_barrio!="Sin informacion",
+         baseComp$comuna !="SIN INFORMACION",baseComp$comuna !="Sin informacion") 
+head(base)
+```
+
+```{r}
+baae_modelo <- base[,c()]
 ```
 
 
-## BASE DE DATOS: Vigilancia en salud pública de las violencias de género
+```{r}
+summary(factor(base$sexo_))
+summary(factor(base$tipo_ss_))
+summary(factor(base$Edad))
+```
+
+
+
+
+
+
+
 
