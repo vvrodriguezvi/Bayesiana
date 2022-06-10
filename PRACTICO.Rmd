@@ -77,7 +77,7 @@ Datos1 <- Datos1[!is.na(Datos1$modoViol),]
 Datos1 <- Datos1[!Datos1$Edad < 1,]
 Datos1 <- Datos1[!Datos1$Edad >=100,]
 
-indv <- sample(1:53220, 500)
+indv <- sample(1:53220, 1000)
 Datos <- Datos1[indv,]
 Datos <- Datos %>%
   select("pac_hos_","Edad","sexo_","tipo_ss_","modoViol" )
@@ -119,7 +119,7 @@ modelo <- function(){
     logit(p[i]) <- inprod(b[], x[i,])
   }
   for (j in 1:K) { # apriori del modelo (vaga o poco informativa)
-    b[j] ~ dnorm(0,1.0E-12) # definimos beta como vector
+    b[j] ~ dnorm(0,1.0E-6) # definimos beta como vector
   }
 }
 
@@ -128,32 +128,43 @@ modelo <- function(){
 N = dim(Datos)[1]
 
 # Input o informacion de entrada
-data.input.jags <- list(y=y, x = X, N = N, K = ncol(X)) 
-
-#k #de parametros(xs)
+data.input.jags <- list(y=y, x = X, N = N, K = ncol(X))  #k #de parametros(xs)
 
 #Parametros a monitorear
 bayes.mod.params <- c("b") 
 
 #Puntos iniciales de la cadena MCMC
 
+set.seed(123)
 bayes.mod.inits <- function(){ # 8 valores iniciales de la cadena.
-  list("b" = rnorm(8,0,1)) #simula normal para los betas ???? {a-1}
+  list("b" = rnorm(8,0,0.4)) #simular los valores iniciales de los betas, con
+                             # una normal poco informativa
 }
-
 
 bayes.mod.fit <- jags(data = data.input.jags, inits = bayes.mod.inits,
                        parameters.to.save = bayes.mod.params, 
-                      n.chains = 3, n.iter = 1000,
+                      n.chains = 2, n.iter = 1000,
                        n.burnin = 500, model.file = modelo)
 
 
 print(bayes.mod.fit)
-traceplot(bayes.mod.fit)
+
 
 
 ```
 
+\subsection{Gráficas}
+
+- Para observar si converge o no
+
+```{r, echo=FALSE}
+
+fit.mcmc <- as.mcmc(bayes.mod.fit)
+x11()
+plot(fit.mcmc)
+
+
+```
 
 
 
