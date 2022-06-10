@@ -204,6 +204,22 @@ for(i in 1:dim(Beta.poste)[2]){
 ```
 
 
+```{r, echo=FALSE}
+
+#test de heib.
+
+fit_mas <- jags(data = data.input.jags, inits = bayes.mod.inits,
+                       parameters.to.save = bayes.mod.params, 
+                      n.chains = 1, n.iter = 1000,
+                       n.burnin = 500, model.file = modelo)
+print(fit_mas)
+fit.mcmc <- as.mcmc(fit_mas)
+x11()
+plot(fit.mcmc)
+
+superdiag(fit.mcmc)
+```
+
 
 
 
