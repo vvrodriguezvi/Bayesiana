@@ -161,14 +161,12 @@ print(bayes.mod.fit)
 
 \subsection{Gráficas}
 
-- Para observar si converge o no
+- Para observar si converge o no y los graficos de densidad posterior
 
 ```{r, echo=FALSE}
-
-
 #Analisis de significancia
-# - Intervalos de probabilidad posterior
 
+# - Intervalos de probabilidad posterior
 #cadena simulada de los coeficientes de regresion
 
 Beta.poste <- bayes.mod.fit$BUGSoutput$sims.list$b
@@ -198,8 +196,7 @@ for(i in 1:dim(Beta.poste)[2]){
 }
 
 
-
- ```
+```
 
 
 
