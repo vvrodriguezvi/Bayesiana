@@ -113,13 +113,18 @@ X = model.matrix(~ x1 + x2 + x3 +x4) #8 betas por que las var son categoricas
 
 betasDim <- head(X)
 
+```
+
+
+```{r, echo=FALSE}
+
 modelo <- function(){
   for (i in 1:N) {
     y[i] ~ dbern(p[i]) 
     logit(p[i]) <- inprod(b[], x[i,])
   }
   for (j in 1:K) { # apriori del modelo (vaga o poco informativa)
-    b[j] ~ dnorm(0,1.0E-6) # definimos beta como vector
+    b[j] ~ dnorm(0,1.0E-12) # definimos beta como vector
   }
 }
 
@@ -128,6 +133,7 @@ modelo <- function(){
 N = dim(Datos)[1]
 
 # Input o informacion de entrada
+
 data.input.jags <- list(y=y, x = X, N = N, K = ncol(X))  #k #de parametros(xs)
 
 #Parametros a monitorear
@@ -137,21 +143,21 @@ bayes.mod.params <- c("b")
 
 set.seed(123)
 bayes.mod.inits <- function(){ # 8 valores iniciales de la cadena.
-  list("b" = rnorm(8,0,0.4)) #simular los valores iniciales de los betas, con
-                             # una normal poco informativa
+  list("b" = rnorm(8,0.01,0.01)) #simular los valores iniciales de los betas, con
+                       # una normal poco informativa, no en 0 ya que los datos son > 0
 }
 
 bayes.mod.fit <- jags(data = data.input.jags, inits = bayes.mod.inits,
                        parameters.to.save = bayes.mod.params, 
-                      n.chains = 2, n.iter = 1000,
-                       n.burnin = 500, model.file = modelo)
+                      n.chains = 3, n.iter = 9000,
+                       n.burnin = 1500, model.file = modelo)
 
 
 print(bayes.mod.fit)
 
 
-
 ```
+
 
 \subsection{Gráficas}
 
@@ -159,12 +165,41 @@ print(bayes.mod.fit)
 
 ```{r, echo=FALSE}
 
-fit.mcmc <- as.mcmc(bayes.mod.fit)
-x11()
-plot(fit.mcmc)
+
+#Analisis de significancia
+# - Intervalos de probabilidad posterior
+
+#cadena simulada de los coeficientes de regresion
+
+Beta.poste <- bayes.mod.fit$BUGSoutput$sims.list$b
+dim(Beta.poste)
+
+#Intervalos HDI para Beta_i
+win.graph()
+par(mfrow=c(dim(Beta.poste)[2],2))
+for(i in 1:dim(Beta.poste)[2]){
+  #Inicio
+  HDI.interval.beta <- hdi(Beta.poste[,i])
+  value1 <- HDI.interval.beta[1]
+  value2 <- HDI.interval.beta[2]
+  DENSITITY.BETA <- density(Beta.poste[,i])
+  win.graph()
+  plot(DENSITITY.BETA, main = "Densidad Posterior", xlab = parse(text=(paste0("beta[",i,"]"))))
+  DENSITITY.BETAy <- DENSITITY.BETA$y
+  DENSITITY.BETAx <- DENSITITY.BETA$x
+  # Lower and higher indices on the X-axis
+  l <- min(which(DENSITITY.BETAx >= value1))
+  h <- max(which(DENSITITY.BETAx < value2))
+  
+  polygon(c(DENSITITY.BETAx[c(l, l:h, h)]),
+          c(0, DENSITITY.BETAy[l:h], 0),
+          col = "slateblue1")
+  #Fin
+}
 
 
-```
+
+ ```
 
 
 
