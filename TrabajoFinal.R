@@ -285,4 +285,111 @@ geweke.diag(posterior23)
 win.graph()
 geweke.plot(posterior23) 
 
+# Modelo sin la variable sexo Y EDAD
+
+X3 <-  model.matrix(~ x1 + x2) 
+
+betasDim <- head(X3) #8 betas por que las var son categoricas 
+
+# Definición del modelo 
+
+modelo <- function(){
+  for (i in 1:N) {
+    y[i] ~ dbern(p[i]) 
+    logit(p[i]) <- inprod(b[], x[i,])
+  }
+  for (j in 1:K) { # apriori del modelo (vaga o poco informativa)
+    b[j] ~ dnorm(0,1.0E-12) # definimos beta como vector
+  }
+}
+
+#Tamano de la muestra
+
+N = dim(Datos)[1]
+
+# Input o informacion de entrada
+
+data.input.jags3 <- list(y=y, x = X3, N = N, K = ncol(X3))  #k N. de parametros de las x
+
+
+#Parametros a monitorear
+
+bayes.mod.params3 <- c("b") 
+
+#Puntos iniciales de la cadena MCMC
+
+set.seed(123)
+bayes.mod.inits3 <- function(){ # 8 valores iniciales de la cadena.
+  list("b" = rnorm(5,0,0.001)) #simular los valores iniciales de los betas, con
+  # una normal poco informativa, no en 0 ya que los datos reales son > 0
+}
+
+bayes.mod.fit3 <- jags(data = data.input.jags3, inits = bayes.mod.inits3,
+                       parameters.to.save = bayes.mod.params3, 
+                       n.chains = 3, n.iter = 9000,
+                       n.burnin = 1500, model.file = modelo)
+
+
+print(bayes.mod.fit3)
+
+## Mismo modelo pero para poder sacar las gráficas de densidad y los traceplot
+## de la convergencia
+
+posterior23<-MCMClogit(pac_hos_~ tipo_ss_+modoViol , b0=0, B0=.001,
+                       data=Datos,burnin=1000,mcmc=25000)
+summary(posterior23)
+
+# trace plot
+win.graph()
+plot(posterior23,trace=FALSE)
+#densidad
+win.graph()
+plot(posterior23, density=FALSE)
+# autocorrelación
+win.graph()
+autocorr.plot(posterior23)
+# geweke con zscore
+geweke.diag(posterior23)
+win.graph()
+geweke.plot(posterior23) 
+
+#ESCOJE EL MEJOR MODELO
+
+# FACTOR DE BAYES:
+
+verosimilitud = function(Beta, X, y){  
+  res = ( (exp(X%*%Beta)/(1+exp(X%*%Beta)) )^y) * (( 1/(1+exp(X%*%Beta))  )^(1-y))
+  return(res)
+}
+
+#modelo 1
+X1 <- X
+#modelos 2
+X2 <- X2
+
+#posterior modelo 1
+
+Beta.simu.poste.M1 = bayes.mod.fit$BUGSoutput$sims.list$b
+dim(Beta.simu.poste.M1)
+
+#posterior modelo 2
+
+Beta.simu.poste.M2 = bayes.mod.fit2$BUGSoutput$sims.list$b
+dim(Beta.simu.poste.M2)
+
+#Verosimilitud marginal modelo 1
+
+vero.marginal1 = mean(sapply(1:dim(Beta.simu.poste.M1)[1], 
+                function(j) exp(sum(log(sapply(1:length(y),
+                function(i){verosimilitud(Beta.simu.poste.M1[j,], X1[i,], y[i])}))))))
+
+#montecarlo(numeradoe de B12)
+
+#Verosimilitud marginal modelo 2
+
+vero.marginal2 = mean(sapply(1:dim(Beta.simu.poste.M2)[1], function(j) exp(sum(log(sapply(1:length(y), function(i){verosimilitud(Beta.simu.poste.M2[j,], X2[i,], y[i])}))))))
+
+B12 = vero.marginal1/vero.marginal2
+1/B12
+
 
