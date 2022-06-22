@@ -77,7 +77,7 @@ Datos1 <- Datos1[!is.na(Datos1$modoViol),]
 Datos1 <- Datos1[!Datos1$Edad < 1,]
 Datos1 <- Datos1[!Datos1$Edad >=100,]
 
-indv <- sample(1:53220, 1000)
+indv <- sample(1:53220, 10000)
 Datos <- Datos1[indv,]
 Datos <- Datos %>%
   select("pac_hos_","Edad","sexo_","tipo_ss_","modoViol" )
@@ -93,6 +93,7 @@ attach(Datos)
 fit <- glm(Datos1$pac_hos_ ~ Datos1$Edad+Datos1$modoViol+Datos1$tipo_ss_+ Datos1$sexo_, family = binomial())
 exp(coef(fit))
 head(fitted(fit))
+
 
 ```
 
@@ -173,6 +174,7 @@ summary(modeloF)
 
 # - Intervalos de probabilidad posterior
 #cadena simulada de los coeficientes de regresion
+traceplot(bayes.mod.fit) #convergencia
 
 Beta.poste <- bayes.mod.fit$BUGSoutput$sims.list$b
 dim(Beta.poste)
@@ -219,6 +221,20 @@ plot(fit.mcmc)
 
 superdiag(fit.mcmc)
 ```
+$$
+\beta_i \sim Normal(\mu \ ,\ \sigma)  \\ 
+log(Y) =  \left[\beta_0+\beta_1X_1+\beta_2X_2+\beta_3X_2+\beta_4X_3+\beta_5X_3+
+\beta_6X_3+ \beta_7X_4+ \epsilon
+\right]
+$$
+Donde:
+- $\beta_1$: Edad del paciente.
+- $\beta_2$: Modo de violencia física.
+- $\_3$: Modo de violencia Psicológica.
+- $B_4$: Regimen Especial.
+- $B_5$: Regimen no asefurado.
+- $B_6$: regimen subsidiado.
+- $B_7$: Sexo del paciente.
 
 
 
