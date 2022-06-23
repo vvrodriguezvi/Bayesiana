@@ -52,7 +52,7 @@ Datos1 <- Datos1[!Datos1$Edad >=100,]
 
 #Selección de una muestra para correr el modelo logístico
 
-indv <- sample(1:53220, 20000)
+indv <- sample(1:53220, 15000)
 Datos <- Datos1[indv,]
 Datos <- Datos %>%
   dplyr::select("pac_hos_","Edad","sexo_","tipo_ss_","modoViol" )
@@ -124,6 +124,7 @@ bayes.mod.fit <- jags(data = data.input.jags, inits = bayes.mod.inits,
 
 
 print(bayes.mod.fit)
+traceplot(bayes.mod.fit)
 
 Beta.poste1 <- bayes.mod.fit$BUGSoutput$sims.list$b
 dim(Beta.poste1)
@@ -132,7 +133,7 @@ dim(Beta.poste1)
 ## de la convergencia
 
 posterior2<-MCMClogit(pac_hos_~ Edad+tipo_ss_+modoViol+sexo_ , b0=0, B0=.001,
-                      data=Datos,burnin=1000,mcmc=25000)
+                      data=Datos,burnin=1500,mcmc=25000)
 summary(posterior2)
 
 # trace plot
@@ -178,7 +179,7 @@ bayes.mod.inits2 <- function(){ # 8 valores iniciales de la cadena.
 bayes.mod.fit2 <- jags(data = data.input.jags2, inits = bayes.mod.inits2,
                       parameters.to.save = bayes.mod.params2, 
                       n.chains = 3, n.iter = 9000,
-                      n.burnin = 1500, model.file = modelo)
+                      n.burnin = 1500, model.file = modelo1)
 
 
 print(bayes.mod.fit2)
@@ -234,7 +235,7 @@ bayes.mod.inits3 <- function(){ # 8 valores iniciales de la cadena.
 bayes.mod.fit3 <- jags(data = data.input.jags3, inits = bayes.mod.inits3,
                        parameters.to.save = bayes.mod.params3, 
                        n.chains = 3, n.iter = 9000,
-                       n.burnin = 1500, model.file = modelo)
+                       n.burnin = 1500, model.file = modelo1)
 
 
 print(bayes.mod.fit3)
@@ -289,7 +290,7 @@ bayes.mod.inits4 <- function(){ # 8 valores iniciales de la cadena.
 bayes.mod.fit4 <- jags(data = data.input.jags4, inits = bayes.mod.inits4,
                        parameters.to.save = bayes.mod.params4, 
                        n.chains = 3, n.iter = 9000,
-                       n.burnin = 1500, model.file = modelo)
+                       n.burnin = 1500, model.file = modelo1)
 
 
 print(bayes.mod.fit4)
@@ -379,7 +380,10 @@ dim(Beta.simu.poste.M1)
 Beta.simu.poste.M2 = bayes.mod.fit$BUGSoutput$sims.list$b
 dim(Beta.simu.poste.M2)
 #Verosimilitud marginal modelo 1
-vero.marginal1 = mean(sapply(1:dim(Beta.simu.poste.M1)[1], function(j) exp(sum(log(sapply(1:length(y), function(i){verosimilitud(Beta.simu.poste.M1[j,], X1[i,], y[i])}))))))
+vero.marginal1 = mean(sapply(1:dim(Beta.simu.poste.M1)[1], 
+        function(j) exp(sum(log(sapply(1:length(y), 
+        function(i){verosimilitud(Beta.simu.poste.M1[j,], 
+        X1[i,], y[i])}))))))
 #montecarlo(numeradoe de B12)
 #Verosimilitud marginal modelo 2
 vero.marginal2 = mean(sapply(1:dim(Beta.simu.poste.M2)[1], function(j) exp(sum(log(sapply(1:length(y), function(i){verosimilitud(Beta.simu.poste.M2[j,], X2[i,], y[i])}))))))
