@@ -1,0 +1,51 @@
+---
+title: "x"
+author: "Valentina Vanessa Rodriguez Villamizar"
+date: '2022-06-24'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+```
+
+**Escoger el mejor modelo usando el factor de Bayes**
+
+Se tienen 3 modelos candidatos para explicar la variable respuesta:
+
+- $Y\sim Edad+Seguridad \ Social \ + \ Tipo \ de \ violencia+\ Sexo$
+
+- $Y\sim Edad+Seguridad \ Social \ + \ Tipo \ de \ violencia$
+
+- $Y\sim Seguridad \ Social \ + \ Tipo \ de \ violencia$
+
+Donde cada modelo tiene verosimilitud dada por $fi(\textbf{y|θi)}$ y $θ_i$ tiene densidad $f(θ_i)$, para i = 1, ... K. Así, el factor de Bayes está dado por:
+
+$$
+B_{ij} = \frac{m_i(y)}{mj(y)}= \frac{\int f_i(\textbf{y}|\theta_i) f_i(\theta_i)}{\int f_j(\textbf{y}|\theta_j) f_j(\theta_j)} \ \ \ 
+\\H_0: Evidencia \ a favor \ del \ modelo \ i\ \ vs \ \  H_a: Evidencia \ a favor \ del \ modelo \ j
+$$
+
+**Comparaciones:**
+
+- **Modelo 1 vs Modelo 2**
+$$
+B_{12} = \frac{m_1(y)}{m2(y)}= \frac{\int f_1(\textbf{y}|\theta_1) f_1(\theta_1)}{\int f_2(\textbf{y}|\theta_2) f_2(\theta_2)} = \frac{1.292708e^{-106}}{1.368882e^{-106}} = 0.944352 $$
+
+- Dado que $B_{12}$ es menor a 1, es evidente que respalda $H_1$, es decir se escoge el modelo 2.
+
+- **Modelo 1 vs Modelo 3**
+
+$$
+B_{12} = \frac{m_1(y)}{m3(y)}= \frac{\int f_1(\textbf{y}|\theta_1) f_1(\theta_1)}{\int f_3(\textbf{y}|\theta_3) f_3(\theta_3)} = \frac{1.292708e^{-106}}{1.192708e^{-106}} = 0.776989 $$
+
+- Dado que $B_{13}$ es menor a 1, es evidente que respalda $H_1$, es decir se escoge el modelo 3.
+
+- **Modelo 2 vs Modelo 3**
+
+$$
+B_{23} = \frac{m_2(y)}{m3(y)}= \frac{\int f_2(\textbf{y}|\theta_2) f_2(\theta_2)}{\int f_3(\textbf{y}|\theta_3) f_3(\theta_3)} = \frac{1.368882e^{-106}}{1.292708^{-106}} = 0.8227738 $$
+
+- Dado que $B_{23}$ es menor a 1, es evidente que respalda $H_1$, es decir se escoge el modelo 3.
